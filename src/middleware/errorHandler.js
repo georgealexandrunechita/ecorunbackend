@@ -11,15 +11,15 @@ class AppError extends Error {
         return new AppError(message, 400, details);
     }
 
-    static unauthorized(message = 'No autorizado') {
+    static unauthorized(message = 'Unauthorized') {
         return new AppError(message, 401);
     }
 
-    static forbidden(message = 'Acceso prohibido') {
+    static forbidden(message = 'Forbidden') {
         return new AppError(message, 403);
     }
 
-    static notFound(message = 'Recurso no encontrado') {
+    static notFound(message = 'Resource not found') {
         return new AppError(message, 404);
     }
 
@@ -27,7 +27,7 @@ class AppError extends Error {
         return new AppError(message, 409);
     }
 
-    static internal(message = 'Error interno del servidor') {
+    static internal(message = 'Internal server error') {
         return new AppError(message, 500);
     }
 }
@@ -42,11 +42,11 @@ const errorHandler = (err, req, res, next) => {
         });
     }
 
-    console.error('ERROR NO OPERACIONAL:', err);
+    console.error('NON-OPERATIONAL ERROR:', err);
 
     return res.status(500).json({
         success: false,
-        message: 'Error interno del servidor',
+        message: 'Internal server error',
         ...(process.env.NODE_ENV === 'development' && {
             error: err.message,
             stack: err.stack,
@@ -55,7 +55,7 @@ const errorHandler = (err, req, res, next) => {
 };
 
 const notFound = (req, res, next) => {
-    next(AppError.notFound(`Ruta ${req.originalUrl} no encontrada`));
+    next(AppError.notFound(`Route ${req.originalUrl} not found`));
 };
 
 module.exports = { AppError, errorHandler, notFound };

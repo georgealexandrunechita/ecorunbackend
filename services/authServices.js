@@ -6,7 +6,7 @@ const UserModel = require('../models/userModel');
 
 
 const SALT_ROUNDS = 10;
-const JWT_SECRET = process.env.JWT_SECRET || 'tu_secret_aqui';
+const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_here';
 const JWT_EXPIRES_IN = '24h';
 
 class AuthService {
@@ -28,10 +28,10 @@ class AuthService {
         } catch (error) {
             if (error.code === 'ER_DUP_ENTRY') {
                 if (error.message.includes('email')) {
-                    throw AppError.conflict('El email ya está registrado');
+                    throw AppError.conflict('Email already registered');
                 }
                 if (error.message.includes('username')) {
-                    throw AppError.conflict('El username ya está en uso');
+                    throw AppError.conflict('Username already taken');
                 }
             }
             throw error;
@@ -45,7 +45,7 @@ class AuthService {
         );
 
         if (users.length === 0) {
-            throw AppError.unauthorized('Credenciales inválidas');
+            throw AppError.unauthorized('Invalid credentials');
         }
 
         const user = users[0];
@@ -53,7 +53,7 @@ class AuthService {
         const isValidPassword = await bcrypt.compare(password, user.password_hash);
 
         if (!isValidPassword) {
-            throw AppError.unauthorized('Credenciales inválidas');
+            throw AppError.unauthorized('Invalid credentials');
         }
 
         const token = jwt.sign(
@@ -78,7 +78,7 @@ class AuthService {
         try {
             return jwt.verify(token, JWT_SECRET);
         } catch (error) {
-            throw AppError.unauthorized('Token inválido o expirado');
+            throw AppError.unauthorized('Invalid or expired token');
         }
     }
 }

@@ -3,7 +3,7 @@ const { AppError } = require('../src/middleware/errorHandler');
 const RunModel = require('../models/runModel');
 
 
-// Convierte ISO 8601 ("2026-03-26T08:00:00.000Z") al formato MySQL DATETIME ("2026-03-26 08:00:00")
+// Converts ISO 8601 ("2026-03-26T08:00:00.000Z") to MySQL DATETIME format ("2026-03-26 08:00:00")
 const toMySQL = (iso) => iso ? iso.replace('T', ' ').replace(/\.\d{3}Z$/, '').replace('Z', '') : null;
 
 class RunService {
@@ -58,7 +58,7 @@ class RunService {
         );
 
         if (runs.length === 0) {
-            throw AppError.notFound('Run no encontrado');
+            throw AppError.notFound('Run not found');
         }
         return runs[0];
     }
@@ -75,7 +75,7 @@ class RunService {
         });
 
         if (fields.length === 0) {
-            throw AppError.badRequest('No hay datos para actualizar');
+            throw AppError.badRequest('No data to update');
         }
 
         values.push(id);
@@ -86,7 +86,7 @@ class RunService {
         );
 
         if (result.affectedRows === 0) {
-            throw AppError.notFound('Run no encontrado');
+            throw AppError.notFound('Run not found');
         }
 
         return this.getRunById(id);
@@ -98,9 +98,9 @@ class RunService {
             [id]
         );
         if (result.affectedRows === 0) {
-            throw AppError.notFound('Run no encontrado');
+            throw AppError.notFound('Run not found');
         }
-        return { message: 'Run eliminado correctamente' };
+        return { message: 'Run deleted successfully' };
     }
 }
 

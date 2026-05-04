@@ -28,7 +28,7 @@ router.post('/register', [
     } catch (error) {
         console.error('Register error:', error);
         if (error.code === 'ER_DUP_ENTRY') {
-            res.status(400).json({ error: 'Usuario ya existe' });
+            res.status(400).json({ error: 'User already exists' });
         } else {
             res.status(500).json({ error: error.message });
         }
@@ -43,12 +43,12 @@ router.post('/login', async (req, res) => {
             [email, email]
         );
 
-        if (users.length === 0) return res.status(401).json({ error: 'Credenciales inválidas' });
+        if (users.length === 0) return res.status(401).json({ error: 'Invalid credentials' });
 
         const user = users[0];
         const valid = await bcrypt.compare(password, user.password_hash);
 
-        if (!valid) return res.status(401).json({ error: 'Credenciales inválidas' });
+        if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
 
         const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'secret');
         res.json({ token, user: { id: user.id, username: user.username, email: user.email } });

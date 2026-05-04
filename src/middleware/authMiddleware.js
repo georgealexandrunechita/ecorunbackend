@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 function authMiddleware(req, res, next) {
     const header = req.headers.authorization;
     if (!header || !header.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'Token requerido' });
+        return res.status(401).json({ error: 'Token required' });
     }
 
     const token = header.split(' ')[1];
@@ -14,7 +14,7 @@ function authMiddleware(req, res, next) {
         next();
     } catch (err) {
         console.error(err);
-        return res.status(401).json({ error: 'Token inválido' });
+        return res.status(401).json({ error: 'Invalid token' });
     }
 }
 

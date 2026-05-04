@@ -17,18 +17,18 @@ router.get('/', async (req, res) => {
         const [rows] = await pool.query(sql);
         return res.json(rows);
     } catch (err) {
-        console.error('Error obteniendo challenges:', err);
-        return res.status(500).json({ error: 'Error obteniendo challenges' });
+        console.error('Error fetching challenges:', err);
+        return res.status(500).json({ error: 'Error fetching challenges' });
     }
 });
 
 
-// IMPORTANTE: /user/:userId debe ir ANTES de /:id para que Express no
-// interprete 'user' como un :id
+// IMPORTANT: /user/:userId must come BEFORE /:id so Express does not
+// interpret 'user' as a :id parameter
 router.get(
     '/user/:userId',
     authMiddleware,
-    [param('userId').isInt({ min: 1 }).withMessage('userId debe ser un entero positivo')],
+    [param('userId').isInt({ min: 1 }).withMessage('userId must be a positive integer')],
     validateRequest,
     async (req, res) => {
         const userId = req.user.id;
@@ -59,10 +59,10 @@ router.get(
             const [rows] = await pool.query(sql, [userId]);
             return res.json(rows);
         } catch (err) {
-            console.error('Error obteniendo challenges del usuario:', err);
+            console.error('Error fetching user challenges:', err);
             return res
                 .status(500)
-                .json({ error: 'Error obteniendo challenges del usuario' });
+                .json({ error: 'Error fetching user challenges' });
         }
     }
 );
@@ -70,7 +70,7 @@ router.get(
 
 router.get(
     '/:id',
-    [param('id').isInt({ min: 1 }).withMessage('id debe ser un entero positivo')],
+    [param('id').isInt({ min: 1 }).withMessage('id must be a positive integer')],
     validateRequest,
     async (req, res) => {
         const { id } = req.params;
@@ -81,13 +81,13 @@ router.get(
             const [rows] = await pool.query(sql, [id]);
 
             if (rows.length === 0) {
-                return res.status(404).json({ error: 'Challenge no encontrado' });
+                return res.status(404).json({ error: 'Challenge not found' });
             }
 
             return res.json(rows[0]);
         } catch (err) {
-            console.error('Error obteniendo challenge:', err);
-            return res.status(500).json({ error: 'Error obteniendo challenge' });
+            console.error('Error fetching challenge:', err);
+            return res.status(500).json({ error: 'Error fetching challenge' });
         }
     }
 );
@@ -99,7 +99,7 @@ router.post(
     [
         param('id')
             .isInt({ min: 1 })
-            .withMessage('id debe ser un entero positivo')
+            .withMessage('id must be a positive integer')
     ],
     validateRequest,
     async (req, res) => {
@@ -114,7 +114,7 @@ router.post(
             if (rows.length === 0) {
                 return res
                     .status(404)
-                    .json({ error: 'Challenge no encontrado o inactivo' });
+                    .json({ error: 'Challenge not found or inactive' });
             }
 
             const sql = `
@@ -128,11 +128,11 @@ router.post(
                 challenge_id: id,
                 status: 'in_progress',
                 progress: 0,
-                message: 'Te has unido al challenge exitosamente'
+                message: 'Successfully joined the challenge'
             });
         } catch (err) {
-            console.error('Error uniéndose al challenge:', err);
-            return res.status(500).json({ error: 'Error uniéndose al challenge' });
+            console.error('Error joining challenge:', err);
+            return res.status(500).json({ error: 'Error joining challenge' });
         }
     }
 );
@@ -144,10 +144,10 @@ router.put(
     [
         param('userChallengeId')
             .isInt({ min: 1 })
-            .withMessage('userChallengeId debe ser un entero positivo'),
+            .withMessage('userChallengeId must be a positive integer'),
         body('progress')
             .isFloat({ min: 0 })
-            .withMessage('progress debe ser un número >= 0')
+            .withMessage('progress must be a number >= 0')
     ],
     validateRequest,
     async (req, res) => {
@@ -165,13 +165,13 @@ router.put(
             if (result.affectedRows === 0) {
                 return res
                     .status(404)
-                    .json({ error: 'Challenge de usuario no encontrado' });
+                    .json({ error: 'User challenge not found' });
             }
 
-            return res.json({ message: 'Progreso actualizado', progress });
+            return res.json({ message: 'Progress updated', progress });
         } catch (err) {
-            console.error('Error actualizando progreso:', err);
-            return res.status(500).json({ error: 'Error actualizando progreso' });
+            console.error('Error updating progress:', err);
+            return res.status(500).json({ error: 'Error updating progress' });
         }
     }
 );
