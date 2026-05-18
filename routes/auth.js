@@ -15,16 +15,26 @@ router.post('/register', [
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
     try {
-        const { username, email, password } = req.body;
+        const { username, name, surname, email, password } = req.body;
         const password_hash = await bcrypt.hash(password, 10);
 
         const [result] = await pool.execute(
-            'INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)',
-            [username, email, password_hash]
+            'INSERT INTO users (username, name, surname, email, password_hash) VALUES (?, ?, ?, ?, ?)',
+            [username, name || username, surname || '', email, password_hash]
         );
 
         const token = jwt.sign({ userId: result.insertId }, process.env.JWT_SECRET || 'secret');
-        res.json({ token, user: { id: result.insertId, username, email } });
+        res.json({
+            token,
+            user: {
+                id: result.insertId,
+                username,
+                name: name || username,
+                surname: surname || '',
+                email,
+                eco_points: 0,
+            }
+        });
     } catch (error) {
         console.error('Register error:', error);
         if (error.code === 'ER_DUP_ENTRY') {
@@ -51,7 +61,18 @@ router.post('/login', async (req, res) => {
         if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
 
         const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'secret');
-        res.json({ token, user: { id: user.id, username: user.username, email: user.email } });
+        res.json({
+            token,
+            user: {
+                id: user.id,
+                username: user.username,
+                name: user.name || user.username,
+                surname: user.surname || '',
+                email: user.email,
+                eco_points: user.eco_points,
+                role: user.role,
+            }
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
