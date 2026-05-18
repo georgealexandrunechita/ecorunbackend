@@ -10,6 +10,7 @@ const { errorHandler, notFound } = require('./src/middleware/errorHandler');
 const authRoutes = require('./routes/auth');
 const runsRoutes = require('./routes/runs');
 const challengesRoutes = require('./routes/challenges');
+const usersRoutes = require('./routes/users');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -53,6 +54,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/runs', runsRoutes);
 app.use('/api/challenges', challengesRoutes);
+app.use('/api/users', usersRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
