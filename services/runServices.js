@@ -38,7 +38,49 @@ class RunService {
             [result.insertId]
         );
 
+        await RunService.updateChallengeProgress(user_id);
+
         return createdRun[0];
+    }
+
+    static async updateChallengeProgress(userId) {
+        const [activeChallenges] = await pool.query(
+            `SELECT uc.id AS uc_id, uc.challenge_id, c.goal_type, c.goal_value
+             FROM user_challenges uc
+             JOIN challenges c ON uc.challenge_id = c.id
+             WHERE uc.user_id = ? AND uc.status = 'in_progress'`,
+            [userId]
+        );
+
+        if (activeChallenges.length === 0) return;
+
+        const [[{ total_km, run_count }]] = await pool.query(
+            `SELECT COALESCE(SUM(distance_km), 0) AS total_km, COUNT(*) AS run_count
+             FROM runs WHERE user_id = ?`,
+            [userId]
+        );
+
+        for (const uc of activeChallenges) {
+            const achieved = uc.goal_type === 'distance' ? parseFloat(total_km) : parseInt(run_count);
+            const progress = Math.min(Math.round((achieved / uc.goal_value) * 100), 100);
+            const newStatus = progress >= 100 ? 'completed' : 'in_progress';
+
+            await pool.query(
+                `UPDATE user_challenges SET progress = ?, status = ? WHERE id = ?`,
+                [progress, newStatus, uc.uc_id]
+            );
+
+            if (newStatus === 'completed') {
+                const [[challenge]] = await pool.query(
+                    'SELECT reward_points FROM challenges WHERE id = ?',
+                    [uc.challenge_id]
+                );
+                await pool.query(
+                    'UPDATE users SET eco_points = eco_points + ? WHERE id = ?',
+                    [challenge.reward_points, userId]
+                );
+            }
+        }
     }
 
     static async getUserRuns(userId) {
