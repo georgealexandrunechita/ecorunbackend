@@ -13,12 +13,20 @@ const loginLimiter = rateLimit({
     legacyHeaders: false,
 });
 
+const registerLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 5,
+    message: { error: 'Too many registration attempts. Please try again in 1 hour.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
 const router = express.Router();
 
-router.post('/register', [
+router.post('/register', registerLimiter, [
     body('username').notEmpty().withMessage('Username required'),
     body('email').isEmail().withMessage('Valid email required'),
-    body('password').isLength({ min: 6 }).withMessage('Password min 6 chars')
+    body('password').isLength({ min: 8 }).withMessage('Password min 8 chars')
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
