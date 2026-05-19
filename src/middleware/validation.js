@@ -23,8 +23,8 @@ const registerValidation = [
         .withMessage('Invalid email'),
 
     body('password')
-        .isLength({ min: 6 })
-        .withMessage('Password must be at least 6 characters')
+        .isLength({ min: 8 })
+        .withMessage('Password must be at least 8 characters')
         .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
         .withMessage('Password must contain uppercase, lowercase and a number'),
 ];
