@@ -1,6 +1,6 @@
-const mysql = require('mysql2/promise');
+const mysql = require('mysql2');
 
-const pool = mysql.createPool({
+const rawPool = mysql.createPool({
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
@@ -12,6 +12,12 @@ const pool = mysql.createPool({
     queueLimit: 0,
 });
 
+rawPool.on('connection', (conn) => {
+    conn.query("SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'");
+});
+
+const pool = rawPool.promise();
+
 const testConnection = async () => {
     const conn = await pool.getConnection();
     await conn.ping();
@@ -19,4 +25,3 @@ const testConnection = async () => {
 };
 
 module.exports = { pool, testConnection };
-
