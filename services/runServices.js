@@ -1,6 +1,5 @@
 const { pool } = require('../src/config/db');
 const { AppError } = require('../src/middleware/errorHandler');
-const RunModel = require('../models/runModel');
 
 
 // Converts ISO 8601 ("2026-03-26T08:00:00.000Z") to MySQL DATETIME format ("2026-03-26 08:00:00")
@@ -38,9 +37,19 @@ class RunService {
             [result.insertId]
         );
 
+        await pool.query(
+            'UPDATE users SET eco_points = eco_points + ? WHERE id = ?',
+            [calculatedPoints, user_id]
+        );
+
         await RunService.updateChallengeProgress(user_id);
 
-        return createdRun[0];
+        const [[{ eco_points }]] = await pool.query(
+            'SELECT eco_points FROM users WHERE id = ?',
+            [user_id]
+        );
+
+        return { ...createdRun[0], user_eco_points: eco_points };
     }
 
     static async updateChallengeProgress(userId) {

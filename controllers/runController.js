@@ -9,7 +9,8 @@ class RunController {
             res.status(201).json({
                 success: true,
                 message: 'Run creado exitosamente',
-                data: newRun
+                data: newRun,
+                eco_points: newRun.user_eco_points,
             });
         } catch (error) {
             next(error);
