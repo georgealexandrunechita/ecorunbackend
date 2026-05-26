@@ -1,0 +1,86 @@
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { pool } = require('../src/config/db');
+const { AppError } = require('../src/middleware/errorHandler');
+const UserModel = require('../models/userModel');
+
+
+const SALT_ROUNDS = 10;
+const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_here';
+const JWT_EXPIRES_IN = '24h';
+
+class AuthService {
+    static async register(username, email, password) {
+        try {
+            const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+
+            const [result] = await pool.query(
+                'INSERT INTO users (username, email, password_hash, ecopoints, role) VALUES (?, ?, ?, 0, "user")',
+                [username, email, hashedPassword]
+            );
+
+            const [users] = await pool.query(
+                'SELECT id, username, email, ecopoints, role, created_at FROM users WHERE id = ?',
+                [result.insertId]
+            );
+
+            return users[0];
+        } catch (error) {
+            if (error.code === 'ER_DUP_ENTRY') {
+                if (error.message.includes('email')) {
+                    throw AppError.conflict('Email already registered');
+                }
+                if (error.message.includes('username')) {
+                    throw AppError.conflict('Username already taken');
+                }
+            }
+            throw error;
+        }
+    }
+
+    static async login(email, password) {
+        const [users] = await pool.query(
+            'SELECT id, username, email, password_hash, ecopoints, role FROM users WHERE email = ?',
+            [email]
+        );
+
+        if (users.length === 0) {
+            throw AppError.unauthorized('Invalid credentials');
+        }
+
+        const user = users[0];
+
+        const isValidPassword = await bcrypt.compare(password, user.password_hash);
+
+        if (!isValidPassword) {
+            throw AppError.unauthorized('Invalid credentials');
+        }
+
+        const token = jwt.sign(
+            {
+                userId: user.id,
+                email: user.email,
+                role: user.role
+            },
+            JWT_SECRET,
+            { expiresIn: JWT_EXPIRES_IN }
+        );
+
+        const { password_hash, ...userWithoutPassword } = user;
+
+        return {
+            user: userWithoutPassword,
+            token,
+        };
+    }
+
+    static verifyToken(token) {
+        try {
+            return jwt.verify(token, JWT_SECRET);
+        } catch (error) {
+            throw AppError.unauthorized('Invalid or expired token');
+        }
+    }
+}
+
+module.exports = AuthService;

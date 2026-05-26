@@ -1,0 +1,40 @@
+# Dependencias
+node_modules/
+
+# Documentación y diario — solo uso local
+API_DOCUMENTATION.md
+DIARIO_DESARROLLO.md
+postman_collection.json
+postman_environment.json
+
+# Variables de entorno — NUNCA subir al repo
+.env
+.env.local
+.env.*.local
+
+# Cobertura de tests
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+logs/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Build / dist
+dist/
+build/
+
+# Base de datos local
+database/
