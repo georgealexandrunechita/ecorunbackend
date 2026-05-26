@@ -44,8 +44,11 @@ const RUN_BODY = {
 describe('POST /api/runs', () => {
     it('crea una carrera correctamente', async () => {
         db.pool.query
-            .mockResolvedValueOnce([{ insertId: 1 }])       // INSERT
-            .mockResolvedValueOnce([[MOCK_RUN]]);             // SELECT tras insertar
+            .mockResolvedValueOnce([{ insertId: 1 }])            // INSERT
+            .mockResolvedValueOnce([[MOCK_RUN]])                  // SELECT tras insertar
+            .mockResolvedValueOnce([{}])                          // UPDATE users eco_points
+            .mockResolvedValueOnce([[]])                          // SELECT activeChallenges (vacío → salida temprana)
+            .mockResolvedValueOnce([[{ eco_points: 50 }]]);       // SELECT eco_points FROM users
 
         const res = await request(app)
             .post('/api/runs')

@@ -13,7 +13,7 @@ function authMiddleware(req, res, next) {
         req.user = { id: decoded.userId };
         next();
     } catch (err) {
-        console.error(err);
+        if (process.env.NODE_ENV !== 'test') console.error(err);
         return res.status(401).json({ error: 'Invalid token' });
     }
 }

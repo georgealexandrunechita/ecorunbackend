@@ -13,7 +13,7 @@ const app = require('../server');
 const db = require('../src/config/db');
 
 // Hash generado una sola vez para todos los tests de login
-const TEST_PASSWORD = 'Test123';
+const TEST_PASSWORD = 'Test1234';
 const TEST_PASSWORD_HASH = bcryptjs.hashSync(TEST_PASSWORD, 1);
 
 const MOCK_USER = {

@@ -5,7 +5,9 @@ const { body, validationResult } = require('express-validator');
 const rateLimit = require('express-rate-limit');
 const { pool } = require('../src/config/db');
 
-const loginLimiter = rateLimit({
+const noLimit = (req, res, next) => next();
+
+const loginLimiter = process.env.NODE_ENV === 'test' ? noLimit : rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 10,
     message: { error: 'Too many login attempts. Please try again in 15 minutes.' },
@@ -13,7 +15,7 @@ const loginLimiter = rateLimit({
     legacyHeaders: false,
 });
 
-const registerLimiter = rateLimit({
+const registerLimiter = process.env.NODE_ENV === 'test' ? noLimit : rateLimit({
     windowMs: 60 * 60 * 1000,
     max: 5,
     message: { error: 'Too many registration attempts. Please try again in 1 hour.' },
@@ -53,7 +55,7 @@ router.post('/register', registerLimiter, [
             }
         });
     } catch (error) {
-        console.error('Register error:', error);
+        if (process.env.NODE_ENV !== 'test') console.error('Register error:', error);
         if (error.code === 'ER_DUP_ENTRY') {
             res.status(400).json({ error: 'User already exists' });
         } else {
