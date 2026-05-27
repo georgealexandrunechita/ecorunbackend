@@ -1,4 +1,5 @@
 require('dotenv').config();
+console.log('[ENV]', { DB_TYPE: process.env.DB_TYPE, DB_HOST: process.env.DB_HOST, DB_NAME: process.env.DB_NAME });
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
