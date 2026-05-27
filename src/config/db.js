@@ -1,4 +1,4 @@
-const DB_TYPE = process.env.DB_TYPE || 'mssql';
+const DB_TYPE = process.env.DB_TYPE || (process.env.NODE_ENV === 'production' ? 'mysql' : 'mssql');
 
 let pool;
 let testConnection;
