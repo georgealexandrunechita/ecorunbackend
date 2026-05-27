@@ -1,5 +1,5 @@
 require('dotenv').config();
-console.log('[ENV]', { DB_TYPE: process.env.DB_TYPE, DB_HOST: process.env.DB_HOST, DB_NAME: process.env.DB_NAME });
+console.log('[ENV]', { NODE_ENV: process.env.NODE_ENV, DB_TYPE: process.env.DB_TYPE, DB_HOST: process.env.DB_HOST, DB_PORT: process.env.DB_PORT, DB_NAME: process.env.DB_NAME, DB_USER: process.env.DB_USER });
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -34,7 +34,7 @@ app.get('/health', async (req, res) => {
             env: process.env.NODE_ENV || 'development',
         });
     } catch (error) {
-        res.status(503).json({ status: 'DB_ERROR', error: error.message });
+        res.status(503).json({ status: 'DB_ERROR', error: error.message || JSON.stringify(error) });
     }
 });
 
