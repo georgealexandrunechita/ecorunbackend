@@ -1,9 +1,7 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { pool } = require('../src/config/db');
 const { AppError } = require('../src/middleware/errorHandler');
-const UserModel = require('../models/userModel');
-
 
 const SALT_ROUNDS = 10;
 const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_here';
