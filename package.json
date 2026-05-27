@@ -5,7 +5,7 @@
   "keywords": [
     "ecorun",
     "daw",
-    "mysql",
+    "mssql",
     "express"
   ],
   "homepage": "https://github.com/georgealexandrunechita/ecorun#readme",
@@ -48,7 +48,8 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.1",
-    "mysql2": "^3.16.3"
+    "msnodesqlv8": "^5.2.0",
+    "mssql": "^11.0.1"
   },
   "devDependencies": {
     "jest": "^29.7.0",

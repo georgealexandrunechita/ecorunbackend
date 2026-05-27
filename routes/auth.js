@@ -56,7 +56,8 @@ router.post('/register', registerLimiter, [
         });
     } catch (error) {
         if (process.env.NODE_ENV !== 'test') console.error('Register error:', error);
-        if (error.code === 'ER_DUP_ENTRY') {
+        // SQL Server unique constraint violation: 2627 (PRIMARY KEY), 2601 (unique index)
+        if (error.number === 2627 || error.number === 2601 || error.code === 'ER_DUP_ENTRY') {
             res.status(400).json({ error: 'User already exists' });
         } else {
             res.status(500).json({ error: error.message });
